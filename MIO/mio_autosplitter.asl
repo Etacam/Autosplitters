@@ -178,9 +178,9 @@ startup
 	settings.Add("cp_halyntemp", false, "Halyn temp", "checkpointobtained");
 
 	settings.Add("tempcheckpointcleared", true, "---Temporary Checkpoint Cleared---");
-	settings.Add("temp_cp_striders", false, "Striders temporary checkpoint", "tempcheckpointcleared");
-	settings.Add("temp_cp_glide", false, "Glide temporary checkpoint", "tempcheckpointcleared");
-	settings.Add("temp_cp_halyn", false, "Halyn temporary checkpoint", "tempcheckpointcleared");
+	settings.Add("temp_cp_striders", false, "Striders temporary checkpoint cleared", "tempcheckpointcleared");
+	settings.Add("temp_cp_glide", false, "Glide temporary checkpoint cleared", "tempcheckpointcleared");
+	settings.Add("temp_cp_halyn", false, "Halyn temporary checkpoint cleared", "tempcheckpointcleared");
 	
 	settings.Add("overseerobtained", true, "---Overseer Obtained---");
 	settings.Add("os_nexus", false, "Nexus", "overseerobtained");	
