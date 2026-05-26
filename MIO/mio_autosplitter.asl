@@ -23,6 +23,7 @@ startup
 	settings.Add("intro", true, "Intro Completed", "misc");
 	settings.Add("hacker_met", true, "Hacker Met (Samsk finished upgrade)", "misc");
 	settings.Add("fan_breakables", true, "Metropolis Last Fan Breakable", "misc");
+	settings.Add("asma_door", false, "Door left of Asma", "misc");
 	
 	settings.Add("bossmeet", false, "---Bosses Meet---");
 	settings.Add("nabuu_meet", false, "Nabuu Meet", "bossmeet");
@@ -175,6 +176,11 @@ startup
 	settings.Add("cp_manufactory", false, "Manufactory", "checkpointobtained");
 	settings.Add("cp_pit", false, "The Pit", "checkpointobtained");
 	settings.Add("cp_halyntemp", false, "Halyn temp", "checkpointobtained");
+
+	settings.Add("tempcheckpointcleared", true, "---Temporary Checkpoint Cleared---");
+	settings.Add("temp_cp_striders", false, "Striders temporary checkpoint", "tempcheckpointcleared");
+	settings.Add("temp_cp_glide", false, "Glide temporary checkpoint", "tempcheckpointcleared");
+	settings.Add("temp_cp_halyn", false, "Halyn temporary checkpoint", "tempcheckpointcleared");
 	
 	settings.Add("overseerobtained", true, "---Overseer Obtained---");
 	settings.Add("os_nexus", false, "Nexus", "overseerobtained");	
@@ -409,6 +415,7 @@ init
 	vars.QuitOutAdjustment = 0; //Time in ms to adjust for each quit out
 	vars.savebus = "";
 	vars.savebusCounter = 0;
+	vars.previousCheckpoint = "";
 	
 	vars.eventExists = (Func<string, bool>)((value) =>
 	{
@@ -425,6 +432,7 @@ init
 			{ "fan_breakables", vars.eventExists("BREAKABLE:0x2213a832e590affa") },
 			{ "badending", vars.eventExists("GAME:BAD_ENDING") },
 			{ "goodending", vars.eventExists("GAME:GOOD_ENDING") },
+			{ "asma_door", vars.eventExists("DOOR:ASMA_RESPECT") },
 			
 			{ "nabuu_meet", vars.eventExists("BOSS_MEET:BAMBY") },
 			{ "egis_meet", vars.eventExists("BOSS_MEET:CRABASH") },
@@ -567,6 +575,10 @@ init
 			{ "cp_manufactory", vars.eventExists("CHECKPOINT:CP_ST_tube_path1_P1") },
 			{ "cp_pit", vars.eventExists("CHECKPOINT:CP_ST_pearl_hill") },
 			{ "cp_halyntemp", vars.eventExists("CHECKPOINT:CP_ST_halyn_temp") },
+
+			{ "temp_cp_striders", vars.eventExists("cp_LQ_under_mast_P2_cleared") },
+			{ "temp_cp_glide", vars.eventExists("cp_ga_bou_bell_top_cleared") },
+			{ "temp_cp_halyn", vars.eventExists("CP_ST_halyn_temp_cleared") },
 			
 			{ "os_nexus", vars.eventExists("OVERSEER:cp_HUB_main_down_P1") },			
 			{ "os_citygates", vars.eventExists("OVERSEER:CP_city_entrance") },
@@ -698,6 +710,21 @@ init
 				vars.NewestList.Add(value);
 			}
 		}
+
+		string checkpointIdPattern = @"checkpoint_id\s*=\s*String\(""([^""]+)""\)";
+		System.Text.RegularExpressions.MatchCollection checkpointMatches = System.Text.RegularExpressions.Regex.Matches(temp, checkpointIdPattern);
+
+		List<string> tempCheckpoints = new List<string>{
+			"cp_LQ_under_mast_P2",
+			"cp_ga_bou_bell_top",
+			"CP_ST_halyn_temp",
+		};
+
+		string checkpointId = checkpointMatches[0].Groups[1].Value;
+		if (tempCheckpoints.Contains(vars.previousCheckpoint) && (vars.previousCheckpoint != checkpointId)) {
+			matchList.Add(vars.previousCheckpoint + "_cleared");
+			vars.NewestList.Add(vars.previousCheckpoint + "_cleared");
+		}
 		
 		if (settings["debug"]) {
 			foreach (string s in vars.NewestList)
@@ -706,6 +733,7 @@ init
 			}
 		}
 		
+		vars.previousCheckpoint = checkpointId;
 		vars.OldList = matchList;
 		vars.CheckData = false;
 		vars.delay = 0;
